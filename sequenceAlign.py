@@ -1,3 +1,8 @@
+import time
+import timeit
+import sys
+from guppy import hpy
+
 def read_file(filename):
     with open(filename, 'r') as f:
         s1 = f.readline().strip()
@@ -22,12 +27,23 @@ def read_file(filename):
     return s1, s1_expand, s2, s2_expand
 
 def write_file(a1, a2, cost, runtime, memory_used):
-
     return 
+    
 def expand(s:str, s_expand:list):
     for idx in s_expand:
         s = s[:idx+1] + s + s[idx+1:]
     return s
+
+def runtime():
+    set_up = '''
+from __main__ import SequenceAlignment
+s1, e1, s2, e2 = read_file('input2.txt')
+s1 = expand(s1, e1)
+s2 = expand(s2, e2)'''
+    test = '''
+SequenceAlignment(s1, s2)
+'''
+    print(timeit.timeit(stmt=test, setup=set_up, globals=globals(), number=1))
 
 def SequenceAlignment(s1, s2):
     m = len(s1)
@@ -90,6 +106,10 @@ if __name__ == "__main__":
     # print_sequences(pairs)
     # gapPenalty = 30
     # simMatrix = {'AA': 0, 'AC':110, 'CA': 110, 'AG': 48, 'GA': 48, 'CC':0, 'AT': 94, 'TA': 94, 'CG':118, 'GC': 118, 'GG': 0, 'TG':110, 'GT':110, 'TT':0, 'CT': 48, 'TC':48}
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+    else: 
+        filename = 'input.txt'
     s1, e1, s2, e2 = read_file('input2.txt')
     s1 = expand(s1, e1)
     # print(s1)
@@ -98,7 +118,11 @@ if __name__ == "__main__":
     # s1 = 'ACCT'
     # s2 = 'ACGT'
     z = SequenceAlignment(s1, s2)
-    print("Alignment of A: ", z[0])
-    print("Alignment of B: ", z[1])
-    print("Similarity score: ", z[2], '\n')
-    write_file(z[0], z[1], z[2], runtime, memory_used)
+    # print(time.process_time())
+
+    # print("Alignment of A: ", z[0])
+    # print("Alignment of B: ", z[1])
+    # print("Similarity score: ", z[2], '\n')
+    # write_file(z[0], z[1], z[2], runtime, memory_used)
+    # print(timeit.timeit('SequenceAlignment(s1, s2)', setup=""))
+    # runtime()

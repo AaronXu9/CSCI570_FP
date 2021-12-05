@@ -1,3 +1,6 @@
+import time
+import timeit
+
 def read_file(filename):
     with open(filename, 'r') as f:
         s1 = f.readline().strip()
@@ -23,7 +26,7 @@ def read_file(filename):
 
 def write_file(a1, a2, cost, runtime, memory_used):
     return 
-    
+
 def expand(s:str, s_expand:list):
     for idx in s_expand:
         s = s[:idx+1] + s + s[idx+1:]
@@ -122,7 +125,7 @@ def efficient_suffix(x, y, simMatrix, gapPenalty):
     
     return mat[1]
 
-def space_efficient_alignment(x, y, simMatrix, gapPenalty, alphEnum):
+def space_efficient_alignment(x, y, simMatrix, gapPenalty):
     # This is the main space_efficient_alignment routine.
     n, m = len(x), len(y)
     if n<2 or m<2:
@@ -142,10 +145,24 @@ def space_efficient_alignment(x, y, simMatrix, gapPenalty, alphEnum):
         # Clear all memory now, so that we don't store data during recursive calls.
         F, B, partition = [], [], []
         # Now make recursive calls.
-        callLeft = space_efficient_alignment(x[:n//2], y[:cut], simMatrix, gapPenalty, alphEnum)
-        callRight = space_efficient_alignment(x[n//2:], y[cut:], simMatrix, gapPenalty, alphEnum)
+        callLeft = space_efficient_alignment(x[:n//2], y[:cut], simMatrix, gapPenalty)
+        callRight = space_efficient_alignment(x[n//2:], y[cut:], simMatrix, gapPenalty)
         # Now return result in format: [1st alignment, 2nd alignment, similarity]
         return [callLeft[r] + callRight[r] for r in range(3)]
+
+def runtime():
+    set_up = '''
+from __main__ import SequenceAlignment
+s1, e1, s2, e2 = read_file('input2.txt')
+s1 = expand(s1, e1)
+s2 = expand(s2, e2)
+gapPenalty = 30
+simMatrix = {'AA': 0, 'AC':110, 'CA': 110, 'AG': 48, 'GA': 48, 'CC':0, 'AT': 94, 'TA': 94, 'CG':118, 'GC': 118, 'GG': 0, 'TG':110, 'GT':110, 'TT':0, 'CT': 48, 'TC':48}'''
+
+    test = '''
+space_efficient_alignment(s1, s2, simMatrix, gapPenalty) 
+'''
+    print(timeit.timeit(stmt=test, setup=set_up, globals=globals(), number=1000))
 
 if __name__ == "__main__":
     # s1 = array([G, T, A, C, A, G, T, A], dtype=np.int16)
@@ -159,11 +176,14 @@ if __name__ == "__main__":
     s1 = expand(s1, e1)
     # print(s1)
     s2 = expand(s2, e2)
-    alphEnum = ''
+    # alphEnum = ''
     # s1 = 'ACCT'
     # s2 = 'ACGT'
-    z = space_efficient_alignment(s1, s2, simMatrix, gapPenalty, alphEnum)
+    z = space_efficient_alignment(s1, s2, simMatrix, gapPenalty)
+    print(time.process_time())
     print("Alignment of A: ", z[0])
     print("Alignment of B: ", z[1])
     print("Similarity score: ", z[2], '\n')
     # write_file(z[0], z[1], z[2], runtime, memory_used)
+    #/usr/bin/time -l -h python3 SA_efficient.py
+    # runtime()
